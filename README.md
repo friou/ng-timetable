@@ -1,27 +1,79 @@
-# Timetable
+# ng-timetable
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.0.8.
+Angular 8 typescript plugin for building nice responsive timetables. Provides a simple typescript interface to add events and locations which can be rendered to nice HTML. Works on mobile devices as well.
 
-## Development server
+It is inspired by unmaintained [timetabje.js](http://timetablejs.org/) and forked from [ng-timetable](https://github.com/zulihan/ng-timetable).
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+It was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.1.1.
 
-## Code scaffolding
+## Installation
+Install with npm:
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+```
+npm install github:friou/ng-timetable
+```
+## Usage
+Add a timetable placeholder:
+```html
+<div #timetable class="timetable"></div>
+```
 
-## Build
+Make a timetable object, optionally set the scope in hours (the visible hours in the timetable):
+```javascript
+@ViewChild('timetable', {static: false}) element: ElementRef;
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+constructor() {
+    this.timetable = new Timetable();
+}
 
-## Running unit tests
+ngAfterViewInit() {
+    this.selector = this.element.nativeElement;
+    this.addTimeTable();
+    this.timetable.setScope(9, 3);
+}
+```
+Add some locations:
+```javascript     
+// OR array     
+this.timetable.addLocations([
+    {'id': '1', 'name': 'Rotterdam'},
+    {'id': '2', 'name': 'Madrid'}
+]);
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+// OR addOne       
+this.timetable.addLocation(
+    {'id': '7', 'name': 'Tokyo'}
+);
+```
+Add your events using `addEvent(name, location, startDate, endDate[, options])`:
+```javascript
+this.timetable.addEvent('Sightseeing', '1', new Date(2015, 7, 17, 9, 0), new Date(2015, 7, 17, 11, 30), {url: '#'});
+```
 
-## Running end-to-end tests
+In addition, you can pass options through an object (optional):
+```javascript
+const options = {
+  url: '#', // makes the event clickable
+  class: 'vip', // additional css class
+  data: { // each property will be added to the data-* attributes of the DOM node for this event
+    id: 4,
+    ticketType: 'VIP'
+  },
+  onClick: function(event, timetable, clickEvent) {} // custom click handler, which is passed the event object and full timetable as context  
+};
+this.timetable.addEvent('Sightseeing', '1', new Date(2015, 7, 17, 9, 0), new Date(2015, 7, 17, 11, 30), options);
+ ```
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+Last, render the thing in your previously created timetable placeholder:
+```javascript
+this.renderer = new Renderer(this.timetable);
+this.renderer.draw(this.selector);
+```
+That's it!
 
-## Further help
+## Browser support
+Timetable.js has been designed to work with modern browsers (only). It has been tested with the latest version of the most common browsers.
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+## Contributing
+
+Please use the Github issue tracker for issues/feature requests. We use Gulp for development and Mocha with Chai for unit testing. The styles are defined in SASS. Feel free to comment/contribute.
